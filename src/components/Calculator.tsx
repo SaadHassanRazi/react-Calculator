@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { Container, Row, Col, InputGroup, Form } from "react-bootstrap";
 
-const Calcultor = () => {
-  const [input, setInput] = useState("");
+interface Button {
+  functionName: (props: string | null) => void;
+  text: string;
+  class: string;
+  funcProps: string | null;
+}
 
-  const handleInput = (props: string) => {
-    setInput(input + props);
+const Calculator: React.FC = () => {
+  const [input, setInput] = useState<string>("");
+  const [history, setHistory] = useState<string[]>([]);
+
+  const handleInput = (props: string | null) => {
+    setInput((prevInput) => prevInput + (props !== null ? props : ""));
   };
 
   const handleClear = () => {
@@ -14,16 +22,19 @@ const Calcultor = () => {
 
   const handleResult = () => {
     try {
-      setInput(eval(input).toString());
+      const result = eval(input).toString();
+      setHistory([...history, `${input} = ${result}`]);
+      setInput("");
     } catch (error) {
       setInput("Error");
     }
   };
 
   const handleBackSpace = () => {
-    setInput(input.slice(0, -1));
+    setInput((prevInput) => prevInput.slice(0, -1));
   };
-  const dataset = [
+
+  const dataset: { row: Button[] }[] = [
     {
       row: [
         {
@@ -35,16 +46,16 @@ const Calcultor = () => {
         {
           functionName: handleInput,
           text: "%",
-          class: "text-danger",
+          class: "text-success",
           funcProps: "%",
         },
         {
           functionName: handleBackSpace,
           text: "Back",
-          class: "text-danger",
+          class: "text-success",
           funcProps: null,
         },
-        { functionName: handleInput, text: "/", class: "", funcProps: "/" },
+        { functionName: handleInput, text: "/", class: "text-success", funcProps: "/" },
       ],
     },
     {
@@ -52,22 +63,27 @@ const Calcultor = () => {
         {
           functionName: handleInput,
           text: "7",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "7",
         },
         {
           functionName: handleInput,
           text: "8",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "8",
         },
         {
           functionName: handleInput,
           text: "9",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "9",
         },
-        { functionName: handleInput, text: "X", class: "", funcProps: "*" },
+        {
+          functionName: handleInput,
+          text: "X",
+          class: "text-success",
+          funcProps: "*",
+        },
       ],
     },
     {
@@ -75,22 +91,22 @@ const Calcultor = () => {
         {
           functionName: handleInput,
           text: "4",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "4",
         },
         {
           functionName: handleInput,
           text: "5",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "5",
         },
         {
           functionName: handleInput,
           text: "6",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "6",
         },
-        { functionName: handleInput, text: "-", class: "", funcProps: "-" },
+        { functionName: handleInput, text: "-", class: "text-success", funcProps: "-" },
       ],
     },
     {
@@ -98,37 +114,37 @@ const Calcultor = () => {
         {
           functionName: handleInput,
           text: "1",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "1",
         },
         {
           functionName: handleInput,
           text: "2",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "2",
         },
         {
           functionName: handleInput,
           text: "3",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "3",
         },
-        { functionName: handleInput, text: "+", class: "", funcProps: "+" },
+        { functionName: handleInput, text: "+", class: "text-success", funcProps: "+" },
       ],
     },
     {
       row: [
-        { functionName: "", text: "", class: "", funcProps: "" },
+        { functionName: () => {}, text: "", class: "", funcProps: "" },
         {
           functionName: handleInput,
           text: "0",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: "0",
         },
         {
           functionName: handleInput,
           text: ".",
-          class: "text-danger",
+          class: "text-dark",
           funcProps: ".",
         },
         {
@@ -141,9 +157,7 @@ const Calcultor = () => {
     },
   ];
 
-  const data = dataset.map((item) => {
-    return item.row;
-  });
+  const data: Button[][] = dataset.map((item) => item.row);
 
   return (
     <>
@@ -157,6 +171,17 @@ const Calcultor = () => {
             aria-describedby="inputGroup-sizing-sm"
           />
         </InputGroup>
+
+        <Row>
+          <Col>
+            <h5>History:</h5>
+            <ul>
+              {history.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </Col>
+        </Row>
 
         {data.map((row, rowIndex) => (
           <Row key={rowIndex}>
@@ -177,4 +202,4 @@ const Calcultor = () => {
   );
 };
 
-export default Calcultor;
+export default Calculator;
